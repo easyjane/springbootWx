@@ -138,4 +138,7 @@ public class User {
         this.city = city;
         this.language = language;
     }
+
+    public User() {
+    }
 }

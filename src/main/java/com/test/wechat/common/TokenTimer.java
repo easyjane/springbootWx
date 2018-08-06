@@ -60,7 +60,7 @@ public class TokenTimer {
             is.read(jsonBytes);
             String message = new String(jsonBytes, "UTF-8");
             JSONObject demoJson = JSONObject.fromObject(message);
-            //System.out.println("JSON字符串："+demoJson);
+            logger.info("json字符串结果："+demoJson);
             setAccessToken(demoJson.getString("access_token"));
             is.close();
             logger.info("==============结束获取access_token===============");

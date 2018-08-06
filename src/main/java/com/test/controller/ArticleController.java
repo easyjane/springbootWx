@@ -16,12 +16,9 @@ import java.util.Map;
 
 @Controller
 @RequestMapping("/article")
-@EnableConfigurationProperties(WeixinTokenConstant.class)
 public class ArticleController {
 
 
-   @Autowired
-   private WeixinTokenConstant weixinTokenConstant;
 
     @Autowired
     private IArticleService articleService;
@@ -32,10 +29,6 @@ public class ArticleController {
         Map map = new HashMap();
 //        int i = articleService.SaveArticle();
 //        map.put("result","成功了"+i+"条数据");
-        map.put("token",weixinTokenConstant.getToken());
-        map.put("appid" ,weixinTokenConstant.getAppid());
-        TokenTimer tt = new TokenTimer();
-        tt.getAccessToken();
 
         return map;
     }

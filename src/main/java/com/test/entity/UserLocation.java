@@ -80,4 +80,7 @@ public class UserLocation {
         this.locationBdX = locationBdX;
         this.locationBdY = locationBdY;
     }
+
+    public UserLocation() {
+    }
 }

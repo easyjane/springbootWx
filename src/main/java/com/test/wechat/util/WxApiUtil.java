@@ -83,6 +83,9 @@ public class WxApiUtil {
     public static void main(String[] args) {
         String url = WX_TOKEN_API.replace("GRANT_TYPE", "a").replace("APPID", "").replace("SECRET", "a");
         System.out.println(url);
+
+        int result = createMenu(MenuUtil.getMenu(),"12_ZOtKmOnaqdWemeMG2ftqq49pXADr6t5rqAcgha20asYihOBvl_DR0RTKzbrhLef3q6yp4fnLk1qBmWZPHYaSS2kAJ0sng-G5NU3imppNj3p-_-YTA0AEV3AyvIVvhFg-DpdoDtDbBW4A29BgOAKeACAGSC");
+        logger.info(result+"--------");
     }
 
 

@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.test.mapper.ViptxtMapper" >
+  <resultMap id="BaseResultMap" type="com.test.entity.Viptxt" >
+    <id column="vtid" property="vtid" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="BIT" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="title" property="title" jdbcType="VARCHAR" />
+    <result column="downloadurl" property="downloadurl" jdbcType="VARCHAR" />
+    <result column="downpwd" property="downpwd" jdbcType="VARCHAR" />
+    <result column="aurl" property="aurl" jdbcType="VARCHAR" />
+    <result column="imgurl" property="imgurl" jdbcType="VARCHAR" />
+    <result column="price" property="price" jdbcType="DOUBLE" />
+    <result column="type" property="type" jdbcType="VARCHAR" />
+    <result column="shareNum" property="sharenum" jdbcType="INTEGER" />
+    <result column="isNew" property="isnew" jdbcType="INTEGER" />
+    <result column="isHot" property="ishot" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    vtid, status, create_time, title, downloadurl, downpwd, aurl, imgurl, price, type, 
+    shareNum, isNew, isHot
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.test.entity.ViptxtExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    'true' as QUERYID,
+    <include refid="Base_Column_List" />
+    from viptxt
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from viptxt
+    where vtid = #{vtid,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from viptxt
+    where vtid = #{vtid,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.test.entity.Viptxt" >
+    <selectKey keyProperty="vtid" resultType="java.lang.String" order="BEFORE">
+      select REPLACE(UUID(),'-','')
+    </selectKey>
+    insert into viptxt (vtid, status, create_time, 
+      title, downloadurl, downpwd, 
+      aurl, imgurl, price, 
+      type, shareNum, isNew, 
+      isHot)
+    values (#{vtid,jdbcType=VARCHAR}, #{status,jdbcType=BIT}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{title,jdbcType=VARCHAR}, #{downloadurl,jdbcType=VARCHAR}, #{downpwd,jdbcType=VARCHAR}, 
+      #{aurl,jdbcType=VARCHAR}, #{imgurl,jdbcType=VARCHAR}, #{price,jdbcType=DOUBLE}, 
+      #{type,jdbcType=VARCHAR}, #{sharenum,jdbcType=INTEGER}, #{isnew,jdbcType=INTEGER}, 
+      #{ishot,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.test.entity.Viptxt" >
+    <selectKey keyProperty="vtid" resultType="java.lang.String" order="BEFORE">
+      select REPLACE(UUID(),'-','')
+    </selectKey>
+    insert into viptxt
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="vtid != null" >
+        vtid,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="title != null" >
+        title,
+      </if>
+      <if test="downloadurl != null" >
+        downloadurl,
+      </if>
+      <if test="downpwd != null" >
+        downpwd,
+      </if>
+      <if test="aurl != null" >
+        aurl,
+      </if>
+      <if test="imgurl != null" >
+        imgurl,
+      </if>
+      <if test="price != null" >
+        price,
+      </if>
+      <if test="type != null" >
+        type,
+      </if>
+      <if test="sharenum != null" >
+        shareNum,
+      </if>
+      <if test="isnew != null" >
+        isNew,
+      </if>
+      <if test="ishot != null" >
+        isHot,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="vtid != null" >
+        #{vtid,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=BIT},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="title != null" >
+        #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="downloadurl != null" >
+        #{downloadurl,jdbcType=VARCHAR},
+      </if>
+      <if test="downpwd != null" >
+        #{downpwd,jdbcType=VARCHAR},
+      </if>
+      <if test="aurl != null" >
+        #{aurl,jdbcType=VARCHAR},
+      </if>
+      <if test="imgurl != null" >
+        #{imgurl,jdbcType=VARCHAR},
+      </if>
+      <if test="price != null" >
+        #{price,jdbcType=DOUBLE},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="sharenum != null" >
+        #{sharenum,jdbcType=INTEGER},
+      </if>
+      <if test="isnew != null" >
+        #{isnew,jdbcType=INTEGER},
+      </if>
+      <if test="ishot != null" >
+        #{ishot,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.test.entity.ViptxtExample" resultType="java.lang.Integer" >
+    select count(*) from viptxt
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.test.entity.Viptxt" >
+    update viptxt
+    <set >
+      <if test="status != null" >
+        status = #{status,jdbcType=BIT},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="title != null" >
+        title = #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="downloadurl != null" >
+        downloadurl = #{downloadurl,jdbcType=VARCHAR},
+      </if>
+      <if test="downpwd != null" >
+        downpwd = #{downpwd,jdbcType=VARCHAR},
+      </if>
+      <if test="aurl != null" >
+        aurl = #{aurl,jdbcType=VARCHAR},
+      </if>
+      <if test="imgurl != null" >
+        imgurl = #{imgurl,jdbcType=VARCHAR},
+      </if>
+      <if test="price != null" >
+        price = #{price,jdbcType=DOUBLE},
+      </if>
+      <if test="type != null" >
+        type = #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="sharenum != null" >
+        shareNum = #{sharenum,jdbcType=INTEGER},
+      </if>
+      <if test="isnew != null" >
+        isNew = #{isnew,jdbcType=INTEGER},
+      </if>
+      <if test="ishot != null" >
+        isHot = #{ishot,jdbcType=INTEGER},
+      </if>
+    </set>
+    where vtid = #{vtid,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.test.entity.Viptxt" >
+    update viptxt
+    set status = #{status,jdbcType=BIT},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      title = #{title,jdbcType=VARCHAR},
+      downloadurl = #{downloadurl,jdbcType=VARCHAR},
+      downpwd = #{downpwd,jdbcType=VARCHAR},
+      aurl = #{aurl,jdbcType=VARCHAR},
+      imgurl = #{imgurl,jdbcType=VARCHAR},
+      price = #{price,jdbcType=DOUBLE},
+      type = #{type,jdbcType=VARCHAR},
+      shareNum = #{sharenum,jdbcType=INTEGER},
+      isNew = #{isnew,jdbcType=INTEGER},
+      isHot = #{ishot,jdbcType=INTEGER}
+    where vtid = #{vtid,jdbcType=VARCHAR}
+  </update>
+</mapper>

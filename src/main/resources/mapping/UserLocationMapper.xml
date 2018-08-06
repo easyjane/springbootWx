@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.test.mapper.UserLocationMapper" >
+  <resultMap id="BaseResultMap" type="com.test.entity.UserLocation" >
+    <id column="ulid" property="ulid" jdbcType="VARCHAR" />
+    <result column="uid" property="uid" jdbcType="VARCHAR" />
+    <result column="open_id" property="openId" jdbcType="VARCHAR" />
+    <result column="location_x" property="locationX" jdbcType="VARCHAR" />
+    <result column="location_y" property="locationY" jdbcType="VARCHAR" />
+    <result column="location_bd_x" property="locationBdX" jdbcType="VARCHAR" />
+    <result column="location_bd_y" property="locationBdY" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    ulid, uid, open_id, location_x, location_y, location_bd_x, location_bd_y
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.test.entity.UserLocationExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    'true' as QUERYID,
+    <include refid="Base_Column_List" />
+    from user_location
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from user_location
+    where ulid = #{ulid,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from user_location
+    where ulid = #{ulid,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.test.entity.UserLocation" >
+    <selectKey keyProperty="ulid" resultType="java.lang.String" order="BEFORE">
+      select REPLACE(UUID(),'-','')
+    </selectKey>
+    insert into user_location (ulid, uid, open_id, 
+      location_x, location_y, location_bd_x, 
+      location_bd_y)
+    values (#{ulid,jdbcType=VARCHAR}, #{uid,jdbcType=VARCHAR}, #{openId,jdbcType=VARCHAR}, 
+      #{locationX,jdbcType=VARCHAR}, #{locationY,jdbcType=VARCHAR}, #{locationBdX,jdbcType=VARCHAR}, 
+      #{locationBdY,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.test.entity.UserLocation" >
+    <selectKey keyProperty="ulid" resultType="java.lang.String" order="BEFORE">
+      select REPLACE(UUID(),'-','')
+    </selectKey>
+    insert into user_location
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="ulid != null" >
+        ulid,
+      </if>
+      <if test="uid != null" >
+        uid,
+      </if>
+      <if test="openId != null" >
+        open_id,
+      </if>
+      <if test="locationX != null" >
+        location_x,
+      </if>
+      <if test="locationY != null" >
+        location_y,
+      </if>
+      <if test="locationBdX != null" >
+        location_bd_x,
+      </if>
+      <if test="locationBdY != null" >
+        location_bd_y,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="ulid != null" >
+        #{ulid,jdbcType=VARCHAR},
+      </if>
+      <if test="uid != null" >
+        #{uid,jdbcType=VARCHAR},
+      </if>
+      <if test="openId != null" >
+        #{openId,jdbcType=VARCHAR},
+      </if>
+      <if test="locationX != null" >
+        #{locationX,jdbcType=VARCHAR},
+      </if>
+      <if test="locationY != null" >
+        #{locationY,jdbcType=VARCHAR},
+      </if>
+      <if test="locationBdX != null" >
+        #{locationBdX,jdbcType=VARCHAR},
+      </if>
+      <if test="locationBdY != null" >
+        #{locationBdY,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.test.entity.UserLocationExample" resultType="java.lang.Integer" >
+    select count(*) from user_location
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.test.entity.UserLocation" >
+    update user_location
+    <set >
+      <if test="uid != null" >
+        uid = #{uid,jdbcType=VARCHAR},
+      </if>
+      <if test="openId != null" >
+        open_id = #{openId,jdbcType=VARCHAR},
+      </if>
+      <if test="locationX != null" >
+        location_x = #{locationX,jdbcType=VARCHAR},
+      </if>
+      <if test="locationY != null" >
+        location_y = #{locationY,jdbcType=VARCHAR},
+      </if>
+      <if test="locationBdX != null" >
+        location_bd_x = #{locationBdX,jdbcType=VARCHAR},
+      </if>
+      <if test="locationBdY != null" >
+        location_bd_y = #{locationBdY,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ulid = #{ulid,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.test.entity.UserLocation" >
+    update user_location
+    set uid = #{uid,jdbcType=VARCHAR},
+      open_id = #{openId,jdbcType=VARCHAR},
+      location_x = #{locationX,jdbcType=VARCHAR},
+      location_y = #{locationY,jdbcType=VARCHAR},
+      location_bd_x = #{locationBdX,jdbcType=VARCHAR},
+      location_bd_y = #{locationBdY,jdbcType=VARCHAR}
+    where ulid = #{ulid,jdbcType=VARCHAR}
+  </update>
+</mapper>

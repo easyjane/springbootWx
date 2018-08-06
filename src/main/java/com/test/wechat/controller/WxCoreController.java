@@ -60,7 +60,7 @@ public class WxCoreController {
 
         Map map = new HashMap();
         map.put("result",true);
-        map.put("msg","成功了");
+        map.put("msg","成功了，this is the test page");
         map.put("code",200);
 
         return map;

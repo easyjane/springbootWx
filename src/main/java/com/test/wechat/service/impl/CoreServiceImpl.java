@@ -9,6 +9,7 @@ import com.test.service.IUserFocusService;
 import com.test.service.IUserLocationService;
 import com.test.service.IUserService;
 import com.test.service.IVipTxtSerivce;
+import com.test.utils.TextSplitUtils;
 import com.test.wechat.common.TokenTimer;
 import com.test.wechat.resp.Article;
 import com.test.wechat.resp.NewsMessage;
@@ -76,7 +77,7 @@ public class CoreServiceImpl implements ICoreService {
             if (msgType.equals(MessageUtil.REQ_MESSAGE_TYPE_TEXT)) {
                 if (StringUtils.isNotBlank(content_)) {
                     Viptxt txt = new Viptxt();
-                    txt.setTitle(content_.trim());
+                    txt.setTitle(TextSplitUtils.getMaxText(content_));
                     PageInfo<Viptxt> txtList = vipTxtSerivce.findPage(1,10,txt);
                     for (Viptxt viptxt: txtList.getList()) {
                         setArticleInfo(articleList,viptxt.getTitle(),"这里是简介"+viptxt.getTitle(),viptxt.getImgurl(),viptxt.getAurl());

@@ -1,11 +1,14 @@
 package com.test.wechat.service.impl;
 
+import com.github.pagehelper.PageInfo;
 import com.test.entity.User;
 import com.test.entity.UserFocus;
 import com.test.entity.UserLocation;
+import com.test.entity.Viptxt;
 import com.test.service.IUserFocusService;
 import com.test.service.IUserLocationService;
 import com.test.service.IUserService;
+import com.test.service.IVipTxtSerivce;
 import com.test.wechat.common.TokenTimer;
 import com.test.wechat.resp.Article;
 import com.test.wechat.resp.NewsMessage;
@@ -15,6 +18,7 @@ import com.test.wechat.util.BaiduMapUtil;
 import com.test.wechat.util.EmojiFilter;
 import com.test.wechat.util.MessageUtil;
 import com.test.wechat.util.WxApiUtil;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,10 +41,14 @@ public class CoreServiceImpl implements ICoreService {
     @Autowired
     private IUserFocusService userFocusService;
 
+    @Autowired
+    private IVipTxtSerivce vipTxtSerivce;
+
 
     @Override
     public String processRequest(HttpServletRequest request) {
 
+        logger.info("已经到这里了，这里要进行判断用户输入的东西了");
         String type = "";
         String fromUserName = "";
         String searchName = "";
@@ -66,49 +74,25 @@ public class CoreServiceImpl implements ICoreService {
             List<Article> articleList = new ArrayList<Article>();
             String content_ = requestMap.get("Content");
             if (msgType.equals(MessageUtil.REQ_MESSAGE_TYPE_TEXT)) {
-                if (content_.startsWith("福利")) {
-                    type = "java福利";
-                    content_ = content_.replace("java福利", "");
-                    searchName = content_;
-                    Map<String, Object> map = new HashMap<String, Object>();
-                    map.put("name", content_);
-                   /* List<VipTxt> vipTxtList = vipTxtMapper.listForPage(map);
-                    String title = "";
-                    String description = "";
-                    String picUrl = "";
-                    String url = "";
-                    if(vipTxtList.size()>0){
-                        VipTxt v = vipTxtList.get(0);
-                        title = v.getTitle();
-                        if(Integer.parseInt(v.getPrice())>0){
-                            description = "该资料为VIP资料，可加QQ490647751开通VIP！";
-                        }else{
-                            description = "下载链接:"+v.getDownloadurl()+"  密码:"+v.getDownpwd();
-                        }
-                        picUrl = v.getImgurl();
-                        url = v.getAurl();
-                    }else{
-                        title = "艳辉网";
-                        description = "暂无该资料！";
-                        picUrl = WX_URL+"resource/img/blog/tuwen/wx-first.jpg";
-                        url = "http://blog.csdn.net/sinat_15153911";
-                    }*/
-
-                    //单图文
-                    Article article = new Article();
-                    article.setTitle("这里是标题");
-                    article.setDescription("这里进行简介");
-                    article.setPicUrl("http://www.dianxdian.com/upload/image/upload/180313_banner.jpg");
-                    article.setUrl("");
-                    articleList.add(article);
-                    newsMessage.setArticleCount(articleList.size());
-                    newsMessage.setArticles(articleList);
-                    respMessage = MessageUtil.messageToXml(newsMessage);
+                if (StringUtils.isNotBlank(content_)) {
+                    Viptxt txt = new Viptxt();
+                    txt.setTitle(content_.trim());
+                    PageInfo<Viptxt> txtList = vipTxtSerivce.findPage(1,10,txt);
+                    for (Viptxt viptxt: txtList.getList()) {
+                        setArticleInfo(articleList,viptxt.getTitle(),"这里是简介"+viptxt.getTitle(),viptxt.getImgurl(),viptxt.getAurl());
+                    }
                 } else {
-                    newsMessage = getFirstArticle(newsMessage, articleList, "/");
-                    respMessage = MessageUtil.messageToXml(newsMessage);
-                    type = "我要福利";
+                    setArticleInfo(articleList,"对不起","请输入文字","http://uploads.xuexila.com/allimg/1602/681-16021FS9153C.png","");
+
                 }
+                if (articleList.size()<=0) {
+                    //单图文
+                    setArticleInfo(articleList,"对不起","您检索的问题我们暂时没有提供","http://uploads.xuexila.com/allimg/1602/681-16021FS9153C.png","");
+                }
+
+                newsMessage.setArticleCount(articleList.size());
+                newsMessage.setArticles(articleList);
+                respMessage = MessageUtil.messageToXml(newsMessage);
             } else if (msgType.equals(MessageUtil.REQ_MESSAGE_TYPE_IMAGE)) {
                 respContent = "您发送的是图片消息！";
                 textMessage.setContent(respContent);
@@ -198,19 +182,36 @@ public class CoreServiceImpl implements ICoreService {
                 else if (eventType.equals(MessageUtil.EVENT_TYPE_CLICK)) {
                 }
             }
-
-            return null;
         } catch (Exception e) {
             e.printStackTrace();
         }
         String url = request.getRequestURL().toString();
 
-        System.out.println("searchname--->"+searchName);
-        System.out.println("fromUser--->"+fromUserName);
-        System.out.println("type--->"+type);
-        System.out.println("url--->"+url);
+        logger.info("searchname--->"+searchName);
+        logger.info("fromUser--->"+fromUserName);
+        logger.info("type--->"+type);
+        logger.info("url--->"+url);
+        logger.info("最后结束");
 
         return respMessage;
+    }
+
+    /**
+     * 设置范文内容
+     * @param articleList
+     * @param title
+     * @param description
+     * @param imgurl
+     * @param url
+     */
+    private void setArticleInfo(List<Article> articleList,String title,String description,String imgurl,String url) {
+        //单图文
+        Article article = new Article();
+        article.setTitle(title);
+        article.setDescription(description);
+        article.setPicUrl(imgurl);
+        article.setUrl(url==null?"":url);
+        articleList.add(article);
     }
 
     private NewsMessage getFirstArticle(NewsMessage newsMessage, List<Article> articleList, String WX_URL) {

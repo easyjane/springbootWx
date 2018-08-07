@@ -30,7 +30,8 @@ public class WxCoreController {
     @Autowired
     private  WeixinTokenConstant weixinTokenConstant;
 
-    @RequestMapping("/wxCore")
+    @RequestMapping(value = "wxCore1",method = RequestMethod.GET)
+    @ResponseBody
     public String checkSignature(@RequestParam(value = "signature" ,required = false) String signature  ,
                                  @RequestParam(value = "nonce",required = false) String  nonce ,
                                  @RequestParam(value = "timestamp",required = false) String  timestamp ,
@@ -49,7 +50,9 @@ public class WxCoreController {
 
     // 调用核心业务类接收消息、处理消息跟推送消息
     @RequestMapping(value = "wxCore1",method = RequestMethod.POST)
+    @ResponseBody
     public  String post(HttpServletRequest request){
+        logger.info("这里是进行消息判定");
         String respMessage = coreService.processRequest(request);
         return respMessage;
     }

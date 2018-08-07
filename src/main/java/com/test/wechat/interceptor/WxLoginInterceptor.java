@@ -37,7 +37,7 @@ public class WxLoginInterceptor implements HandlerInterceptor {
         HttpSession session = request.getSession();
         String appid = weixinTokenConstant.getAppid();
         String appSecret = weixinTokenConstant.getAppsecret();
-
+        logger.info("从这里开始进行用户的登录验证");
         User user = (User) session.getAttribute(Constant.WX_LOGIN_SESSION);
         if (user == null) {
             String queryStr = request.getQueryString();
@@ -86,6 +86,7 @@ public class WxLoginInterceptor implements HandlerInterceptor {
                         userService.add(user);
                     }
                     session.setAttribute(Constant.WX_LOGIN_SESSION,user);
+                    logger.info("用户登录成功");
                 } catch (IOException e) {
                     logger.error("从微信获取用户信息失败" + e.getMessage(), e);
                 }

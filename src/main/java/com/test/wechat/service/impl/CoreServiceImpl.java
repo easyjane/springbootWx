@@ -5,6 +5,7 @@ import com.github.pagehelper.PageInfo;
 import com.test.entity.*;
 import com.test.service.*;
 import com.test.utils.DateUtil;
+import com.test.utils.JsonUtils;
 import com.test.utils.TextSplitUtils;
 import com.test.wechat.common.TokenTimer;
 import com.test.wechat.resp.Article;
@@ -93,36 +94,31 @@ public class CoreServiceImpl implements ICoreService {
                     chatOutUt.setStatus(3);
                     chatOutUt.setOpenId(fromUserName);
                     PageInfo<UserText> charOutUtPage = userTextService.findPage(0, 10, chatOutUt);
-                    chatOutUt = utPage.getList().size() > 0 ? utPage.getList().get(0) : null;
+                    chatOutUt = charOutUtPage.getList().size() > 0 ? charOutUtPage.getList().get(0) : null;
 
                     Date now = new Date();
-
+                    logger.info("userText"+userText);
+                    logger.info("chatOutUt"+chatOutUt);
                     if (content_.contains("进入闲聊") || content_.contains("进入聊天") || "闲聊模式".equals(content_) || "闲聊".equals(content_) || "聊天".equals(content_) || "聊天模式".equals(content_)) {
-
-                        UserText ut = new UserText();
-                        ut.setContent(content_);
-                        ut.setCreateTime(new Date());
-                        ut.setOpenId(fromUserName);
-                        ut.setType(msgType);
-                        ut.setStatus(2);
-                        userTextService.add(ut);
-                        respContent = "你好呀，现在可以和我聊天了哦o(∩_∩)o 哈哈";
-                        textMessage.setContent(respContent);
-                        respMessage = MessageUtil.messageToXml(textMessage);
-                        return respMessage;
+                        logger.info("进入闲聊");
+                        return out30Min(fromUserName, respMessage, msgType, textMessage, content_, 2, "你好呀，现在可以和我聊天了哦o(∩_∩)o 哈哈");
                     } else if (content_.contains("退出") || content_.contains("exit")) {
-                        UserText ut = new UserText();
-                        ut.setContent(content_);
-                        ut.setCreateTime(new Date());
-                        ut.setOpenId(fromUserName);
-                        ut.setType(msgType);
-                        ut.setStatus(3);
-                        userTextService.add(ut);
-                        respContent = "您已经退出闲聊模式";
-                        textMessage.setContent(respContent);
-                        respMessage = MessageUtil.messageToXml(textMessage);
-                        return respMessage;
-                    } else if (userText != null && !userText.getCreateTime().before(DateUtil.addMinute(now, 30)) && userText.getCreateTime().after(chatOutUt.getCreateTime())) {
+                        logger.info("推出闲聊");
+                        return out30Min(fromUserName, respMessage, msgType, textMessage, content_, 3, "您已经退出闲聊模式");
+                    } else if (userText != null && userText.getCreateTime().before(DateUtil.addMinute(now, -30)) && ( chatOutUt == null || userText.getCreateTime().after(chatOutUt.getCreateTime()))) {
+
+                        logger.info("时间超过30分钟，退出闲聊");
+                        return out30Min(fromUserName, respMessage, msgType, textMessage, content_, 3, "您已经超过了30分钟，自动退出闲聊模式");
+
+                    } else if (userText != null && userText.getCreateTime().before(DateUtil.addMinute(now, -30)) && ( chatOutUt == null || userText.getCreateTime().before(chatOutUt.getCreateTime()))) {
+                        logger.info("时间超过30分钟，退出闲聊");
+                        return out30Min(fromUserName, respMessage, msgType, textMessage, content_, 3, "您已经超过了30分钟，自动退出闲聊模式");
+
+                    } else if (userText != null && userText.getCreateTime().after(DateUtil.addMinute(now, -30)) && ( chatOutUt == null || userText.getCreateTime().after(chatOutUt.getCreateTime()))) {
+                        logger.info("闲聊中");
+//                        if (userText.getCreateTime().before(chatOutUt.getCreateTime())) {
+//                            return out30Min(fromUserName, respMessage, msgType, textMessage, content_, 3, "您已经超过了30分钟，自动退出闲聊模式");
+//                        }
 
                         TAipNlp aipNlp = new TAipNlp(TENCENT_AI_APP_ID, TENCENT_AI_APP_KEY);
                         String session = new Date().getTime() / 1000 + "";
@@ -131,24 +127,19 @@ public class CoreServiceImpl implements ICoreService {
                         userText.setCreateTime(now);
                         userTextService.add(userText);
 
-                        respContent = result;
+                        Map paraMap = new HashMap();
+                        paraMap.put("data",Map.class);
+                        Map resultMap = (Map) JsonUtils.str2Obj(result,Map.class,paraMap);
+                        if (!resultMap.get("ret").toString().equals("0")) {
+                            respContent = "你说什么啊？";
+                        }
+                        Map dataMap = (Map) resultMap.get("data");
+                        respContent = dataMap.get("answer").toString();
                         textMessage.setContent(respContent);
                         respMessage = MessageUtil.messageToXml(textMessage);
                         return respMessage;
-                    } else if (userText != null && userText.getCreateTime().before(DateUtil.addMinute(now, 30)) && userText.getCreateTime().after(chatOutUt.getCreateTime())) {
-
-                        UserText ut = new UserText();
-                        ut.setContent(content_);
-                        ut.setCreateTime(new Date());
-                        ut.setOpenId(fromUserName);
-                        ut.setType(msgType);
-                        ut.setStatus(3);
-                        userTextService.add(ut);
-                        respContent = "您已经超过了30分钟，自动退出闲聊模式";
-                        textMessage.setContent(respContent);
-                        respMessage = MessageUtil.messageToXml(textMessage);
-                        return respMessage;
-                    } else {
+                    }else {
+                        logger.info("判断失败了");
                         UserText ut = new UserText();
                         ut.setContent(content_);
                         ut.setCreateTime(new Date());
@@ -169,7 +160,7 @@ public class CoreServiceImpl implements ICoreService {
 
                 if (articleList.size() <= 0) {
                     //单图文
-                    setArticleInfo(articleList, "对不起", "您检索的问题我们暂时没有提供", "http://uploads.xuexila.com/allimg/1602/681-16021FS9153C.png", "");
+                    setArticleInfo(articleList, "对不起", "您检索的问题我们暂时没有提供", "http://c.hiphotos.baidu.com/image/pic/item/f9198618367adab4b025268587d4b31c8601e47b.jpg", "");
                 }
 
                 newsMessage.setArticleCount(articleList.size());
@@ -276,6 +267,21 @@ public class CoreServiceImpl implements ICoreService {
         logger.info("url--->" + url);
         logger.info("最后结束");
 
+        return respMessage;
+    }
+
+    private String out30Min(String fromUserName, String respMessage, String msgType, TextMessage textMessage, String content_, int i, String s) {
+        String respContent;
+        UserText ut = new UserText();
+        ut.setContent(content_);
+        ut.setCreateTime(new Date());
+        ut.setOpenId(fromUserName);
+        ut.setType(msgType);
+        ut.setStatus(i);
+        userTextService.add(ut);
+        respContent = s;
+        textMessage.setContent(respContent);
+        respMessage = MessageUtil.messageToXml(textMessage);
         return respMessage;
     }
 

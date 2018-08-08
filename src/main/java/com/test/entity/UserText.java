@@ -92,4 +92,19 @@ public class UserText {
     public void setStatus(Integer status) {
         this.status = status;
     }
+
+    @Override
+    public String toString() {
+        return "UserText{" +
+                "utid='" + utid + '\'' +
+                ", openId='" + openId + '\'' +
+                ", uid='" + uid + '\'' +
+                ", content='" + content + '\'' +
+                ", createTime=" + createTime +
+                ", type='" + type + '\'' +
+                ", url='" + url + '\'' +
+                ", uname='" + uname + '\'' +
+                ", status=" + status +
+                '}';
+    }
 }

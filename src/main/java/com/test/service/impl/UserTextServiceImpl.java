@@ -31,16 +31,18 @@ public class UserTextServiceImpl implements IUserTextService {
     public PageInfo<UserText> findPage(int pageNo, int pageSize, UserText obj) {
         PageHelper.startPage(pageNo,pageSize);
         UserTextExample example = new UserTextExample();
+        UserTextExample.Criteria criteria = example.createCriteria();
         if (StringUtils.isNotBlank(obj.getOpenId())) {
-            example.createCriteria().andOpenIdEqualTo(obj.getOpenId());
+            criteria.andOpenIdEqualTo(obj.getOpenId());
         }
         if (obj.getCreateTime() != null) {
             Date now = new Date();
-            example.createCriteria().andCreateTimeLessThan(DateUtil.addMinute(now,30));
+            criteria.andCreateTimeLessThan(DateUtil.addMinute(now,30));
         }
         if (obj.getStatus() != null) {
-            example.createCriteria().andStatusEqualTo(obj.getStatus());
+            criteria.andStatusEqualTo(obj.getStatus());
         }
+
         example.setOrderByClause("create_time desc");
         List<UserText> list = userTextMapper.selectByExample(example);
         return new PageInfo<>(list);

@@ -17,9 +17,11 @@ public class Article {
 
     private String editName;
 
-    private Byte status;
+    private Integer status;
 
     private Date editTime;
+
+    private String title;
 
     private String content;
 
@@ -79,11 +81,11 @@ public class Article {
         this.editName = editName == null ? null : editName.trim();
     }
 
-    public Byte getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(Byte status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 
@@ -93,6 +95,14 @@ public class Article {
 
     public void setEditTime(Date editTime) {
         this.editTime = editTime;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title == null ? null : title.trim();
     }
 
     public String getContent() {

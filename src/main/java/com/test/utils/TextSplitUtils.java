@@ -66,7 +66,7 @@ public class TextSplitUtils {
         String result = HttpUtils.postHttpData(url,map);
         Map wordsMap = new HashMap();
         wordsMap.put("words", Words.class);
-        JsonResult jr = (JsonResult) JSONObject.toBean(JSONObject.fromObject(result),JsonResult.class,wordsMap);
+        JsonResult jr = (JsonResult) JsonUtils.str2Obj(result,JsonResult.class,wordsMap);
         List<Words> works = jr.getWords();
         listSort(works);
         logger.info("words:"+works);

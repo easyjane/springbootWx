@@ -1,39 +1,40 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.test.mapper.ArticleMapper" >
-  <resultMap id="BaseResultMap" type="com.test.entity.Article" >
-    <id column="aid" property="aid" jdbcType="VARCHAR" />
-    <result column="date" property="date" jdbcType="VARCHAR" />
-    <result column="date_china" property="dateChina" jdbcType="VARCHAR" />
-    <result column="intro" property="intro" jdbcType="VARCHAR" />
-    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
-    <result column="editor" property="editor" jdbcType="VARCHAR" />
-    <result column="edit_name" property="editName" jdbcType="VARCHAR" />
-    <result column="status" property="status" jdbcType="TINYINT" />
-    <result column="edit_time" property="editTime" jdbcType="TIMESTAMP" />
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.test.mapper.ArticleMapper">
+  <resultMap id="BaseResultMap" type="com.test.entity.Article">
+    <id column="aid" jdbcType="VARCHAR" property="aid" />
+    <result column="date" jdbcType="VARCHAR" property="date" />
+    <result column="date_china" jdbcType="VARCHAR" property="dateChina" />
+    <result column="intro" jdbcType="VARCHAR" property="intro" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="editor" jdbcType="VARCHAR" property="editor" />
+    <result column="edit_name" jdbcType="VARCHAR" property="editName" />
+    <result column="status" jdbcType="TINYINT" property="status" />
+    <result column="edit_time" jdbcType="TIMESTAMP" property="editTime" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
   </resultMap>
-  <resultMap id="ResultMapWithBLOBs" type="com.test.entity.Article" extends="BaseResultMap" >
-    <result column="content" property="content" jdbcType="LONGVARCHAR" />
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.test.entity.Article">
+    <result column="content" jdbcType="LONGVARCHAR" property="content" />
   </resultMap>
-  <sql id="Example_Where_Clause" >
-    <where >
-      <foreach collection="oredCriteria" item="criteria" separator="or" >
-        <if test="criteria.valid" >
-          <trim prefix="(" suffix=")" prefixOverrides="and" >
-            <foreach collection="criteria.criteria" item="criterion" >
-              <choose >
-                <when test="criterion.noValue" >
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
                   and ${criterion.condition}
                 </when>
-                <when test="criterion.singleValue" >
+                <when test="criterion.singleValue">
                   and ${criterion.condition} #{criterion.value}
                 </when>
-                <when test="criterion.betweenValue" >
+                <when test="criterion.betweenValue">
                   and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
                 </when>
-                <when test="criterion.listValue" >
+                <when test="criterion.listValue">
                   and ${criterion.condition}
-                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
                     #{listItem}
                   </foreach>
                 </when>
@@ -44,15 +45,16 @@
       </foreach>
     </where>
   </sql>
-  <sql id="Base_Column_List" >
-    aid, date, date_china, intro, create_time, editor, edit_name, status, edit_time
+  <sql id="Base_Column_List">
+    aid, date, date_china, intro, create_time, editor, edit_name, status, edit_time, 
+    title
   </sql>
-  <sql id="Blob_Column_List" >
+  <sql id="Blob_Column_List">
     content
   </sql>
-  <select id="selectByExampleWithBLOBs" resultMap="ResultMapWithBLOBs" parameterType="com.test.entity.ArticleExample" >
+  <select id="selectByExampleWithBLOBs" parameterType="com.test.entity.ArticleExample" resultMap="ResultMapWithBLOBs">
     select
-    <if test="distinct" >
+    <if test="distinct">
       distinct
     </if>
     'true' as QUERYID,
@@ -60,29 +62,29 @@
     ,
     <include refid="Blob_Column_List" />
     from article
-    <if test="_parameter != null" >
+    <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
-    <if test="orderByClause != null" >
+    <if test="orderByClause != null">
       order by ${orderByClause}
     </if>
   </select>
-  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.test.entity.ArticleExample" >
+  <select id="selectByExample" parameterType="com.test.entity.ArticleExample" resultMap="BaseResultMap">
     select
-    <if test="distinct" >
+    <if test="distinct">
       distinct
     </if>
     'true' as QUERYID,
     <include refid="Base_Column_List" />
     from article
-    <if test="_parameter != null" >
+    <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
-    <if test="orderByClause != null" >
+    <if test="orderByClause != null">
       order by ${orderByClause}
     </if>
   </select>
-  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.String" >
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="ResultMapWithBLOBs">
     select 
     <include refid="Base_Column_List" />
     ,
@@ -90,133 +92,142 @@
     from article
     where aid = #{aid,jdbcType=VARCHAR}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
     delete from article
     where aid = #{aid,jdbcType=VARCHAR}
   </delete>
-  <insert id="insert" parameterType="com.test.entity.Article" >
+  <insert id="insert" parameterType="com.test.entity.Article">
     <selectKey keyProperty="aid" resultType="java.lang.String" order="BEFORE">
       select REPLACE(UUID(),'-','')
     </selectKey>
     insert into article (aid, date, date_china, 
       intro, create_time, editor, 
       edit_name, status, edit_time, 
-      content)
+      title, content)
     values (#{aid,jdbcType=VARCHAR}, #{date,jdbcType=VARCHAR}, #{dateChina,jdbcType=VARCHAR}, 
       #{intro,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{editor,jdbcType=VARCHAR}, 
       #{editName,jdbcType=VARCHAR}, #{status,jdbcType=TINYINT}, #{editTime,jdbcType=TIMESTAMP}, 
-      #{content,jdbcType=LONGVARCHAR})
+      #{title,jdbcType=VARCHAR}, #{content,jdbcType=LONGVARCHAR})
   </insert>
-  <insert id="insertSelective" parameterType="com.test.entity.Article" >
+  <insert id="insertSelective" parameterType="com.test.entity.Article">
     <selectKey keyProperty="aid" resultType="java.lang.String" order="BEFORE">
       select REPLACE(UUID(),'-','')
     </selectKey>
     insert into article
-    <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="aid != null" >
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="aid != null">
         aid,
       </if>
-      <if test="date != null" >
+      <if test="date != null">
         date,
       </if>
-      <if test="dateChina != null" >
+      <if test="dateChina != null">
         date_china,
       </if>
-      <if test="intro != null" >
+      <if test="intro != null">
         intro,
       </if>
-      <if test="createTime != null" >
+      <if test="createTime != null">
         create_time,
       </if>
-      <if test="editor != null" >
+      <if test="editor != null">
         editor,
       </if>
-      <if test="editName != null" >
+      <if test="editName != null">
         edit_name,
       </if>
-      <if test="status != null" >
+      <if test="status != null">
         status,
       </if>
-      <if test="editTime != null" >
+      <if test="editTime != null">
         edit_time,
       </if>
-      <if test="content != null" >
+      <if test="title != null">
+        title,
+      </if>
+      <if test="content != null">
         content,
       </if>
     </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="aid != null" >
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="aid != null">
         #{aid,jdbcType=VARCHAR},
       </if>
-      <if test="date != null" >
+      <if test="date != null">
         #{date,jdbcType=VARCHAR},
       </if>
-      <if test="dateChina != null" >
+      <if test="dateChina != null">
         #{dateChina,jdbcType=VARCHAR},
       </if>
-      <if test="intro != null" >
+      <if test="intro != null">
         #{intro,jdbcType=VARCHAR},
       </if>
-      <if test="createTime != null" >
+      <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="editor != null" >
+      <if test="editor != null">
         #{editor,jdbcType=VARCHAR},
       </if>
-      <if test="editName != null" >
+      <if test="editName != null">
         #{editName,jdbcType=VARCHAR},
       </if>
-      <if test="status != null" >
+      <if test="status != null">
         #{status,jdbcType=TINYINT},
       </if>
-      <if test="editTime != null" >
+      <if test="editTime != null">
         #{editTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="content != null" >
+      <if test="title != null">
+        #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null">
         #{content,jdbcType=LONGVARCHAR},
       </if>
     </trim>
   </insert>
-  <select id="countByExample" parameterType="com.test.entity.ArticleExample" resultType="java.lang.Integer" >
+  <select id="countByExample" parameterType="com.test.entity.ArticleExample" resultType="java.lang.Integer">
     select count(*) from article
-    <if test="_parameter != null" >
+    <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </select>
-  <update id="updateByPrimaryKeySelective" parameterType="com.test.entity.Article" >
+  <update id="updateByPrimaryKeySelective" parameterType="com.test.entity.Article">
     update article
-    <set >
-      <if test="date != null" >
+    <set>
+      <if test="date != null">
         date = #{date,jdbcType=VARCHAR},
       </if>
-      <if test="dateChina != null" >
+      <if test="dateChina != null">
         date_china = #{dateChina,jdbcType=VARCHAR},
       </if>
-      <if test="intro != null" >
+      <if test="intro != null">
         intro = #{intro,jdbcType=VARCHAR},
       </if>
-      <if test="createTime != null" >
+      <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="editor != null" >
+      <if test="editor != null">
         editor = #{editor,jdbcType=VARCHAR},
       </if>
-      <if test="editName != null" >
+      <if test="editName != null">
         edit_name = #{editName,jdbcType=VARCHAR},
       </if>
-      <if test="status != null" >
+      <if test="status != null">
         status = #{status,jdbcType=TINYINT},
       </if>
-      <if test="editTime != null" >
+      <if test="editTime != null">
         edit_time = #{editTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="content != null" >
+      <if test="title != null">
+        title = #{title,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null">
         content = #{content,jdbcType=LONGVARCHAR},
       </if>
     </set>
     where aid = #{aid,jdbcType=VARCHAR}
   </update>
-  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.test.entity.Article" >
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.test.entity.Article">
     update article
     set date = #{date,jdbcType=VARCHAR},
       date_china = #{dateChina,jdbcType=VARCHAR},
@@ -226,10 +237,11 @@
       edit_name = #{editName,jdbcType=VARCHAR},
       status = #{status,jdbcType=TINYINT},
       edit_time = #{editTime,jdbcType=TIMESTAMP},
+      title = #{title,jdbcType=VARCHAR},
       content = #{content,jdbcType=LONGVARCHAR}
     where aid = #{aid,jdbcType=VARCHAR}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.test.entity.Article" >
+  <update id="updateByPrimaryKey" parameterType="com.test.entity.Article">
     update article
     set date = #{date,jdbcType=VARCHAR},
       date_china = #{dateChina,jdbcType=VARCHAR},
@@ -238,7 +250,8 @@
       editor = #{editor,jdbcType=VARCHAR},
       edit_name = #{editName,jdbcType=VARCHAR},
       status = #{status,jdbcType=TINYINT},
-      edit_time = #{editTime,jdbcType=TIMESTAMP}
+      edit_time = #{editTime,jdbcType=TIMESTAMP},
+      title = #{title,jdbcType=VARCHAR}
     where aid = #{aid,jdbcType=VARCHAR}
   </update>
 </mapper>

@@ -1,14 +1,10 @@
 package com.test.wechat.service.impl;
 
+import cn.xsshome.taip.nlp.TAipNlp;
 import com.github.pagehelper.PageInfo;
-import com.test.entity.User;
-import com.test.entity.UserFocus;
-import com.test.entity.UserLocation;
-import com.test.entity.Viptxt;
-import com.test.service.IUserFocusService;
-import com.test.service.IUserLocationService;
-import com.test.service.IUserService;
-import com.test.service.IVipTxtSerivce;
+import com.test.entity.*;
+import com.test.service.*;
+import com.test.utils.DateUtil;
 import com.test.utils.TextSplitUtils;
 import com.test.wechat.common.TokenTimer;
 import com.test.wechat.resp.Article;
@@ -24,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import sun.security.provider.MD5;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
@@ -32,6 +29,9 @@ import java.util.*;
 public class CoreServiceImpl implements ICoreService {
 
     private static Logger logger = LoggerFactory.getLogger(CoreServiceImpl.class);
+
+    private static final String TENCENT_AI_APP_ID = "2107744650";
+    private static final String TENCENT_AI_APP_KEY = "Ex9D2TOvJZNGVdsG";
 
     @Autowired
     private IUserLocationService userLocationService;
@@ -45,6 +45,9 @@ public class CoreServiceImpl implements ICoreService {
     @Autowired
     private IVipTxtSerivce vipTxtSerivce;
 
+    @Autowired
+    private IUserTextService userTextService;
+
 
     @Override
     public String processRequest(HttpServletRequest request) {
@@ -57,11 +60,12 @@ public class CoreServiceImpl implements ICoreService {
         try {
             Date addTime = new Date();
             String respContent = "请求处理异常，请稍候尝试！";
-            type = "请求处理异常";
+
             Map<String, String> requestMap = MessageUtil.parseXml(request);
             fromUserName = requestMap.get("FromUserName");
             String toUserName = requestMap.get("ToUserName");
             String msgType = requestMap.get("MsgType");
+            type = requestMap.get("MsgType");
             TextMessage textMessage = new TextMessage();
             textMessage.setToUserName(fromUserName);
             textMessage.setFromUserName(toUserName);
@@ -76,19 +80,96 @@ public class CoreServiceImpl implements ICoreService {
             String content_ = requestMap.get("Content");
             if (msgType.equals(MessageUtil.REQ_MESSAGE_TYPE_TEXT)) {
                 if (StringUtils.isNotBlank(content_)) {
-                    Viptxt txt = new Viptxt();
-                    txt.setTitle(TextSplitUtils.getMaxText(content_));
-                    PageInfo<Viptxt> txtList = vipTxtSerivce.findPage(1,10,txt);
-                    for (Viptxt viptxt: txtList.getList()) {
-                        setArticleInfo(articleList,viptxt.getTitle(),"这里是简介"+viptxt.getTitle(),viptxt.getImgurl(),viptxt.getAurl());
+
+                    // 当前用户进入闲聊的记录
+                    UserText userText = new UserText();
+                    userText.setStatus(2);
+                    userText.setOpenId(fromUserName);
+                    PageInfo<UserText> utPage = userTextService.findPage(0, 10, userText);
+                    userText = utPage.getList().size() > 0 ? utPage.getList().get(0) : null;
+
+                    // 退出闲聊的记录
+                    UserText chatOutUt = new UserText();
+                    chatOutUt.setStatus(3);
+                    chatOutUt.setOpenId(fromUserName);
+                    PageInfo<UserText> charOutUtPage = userTextService.findPage(0, 10, chatOutUt);
+                    chatOutUt = utPage.getList().size() > 0 ? utPage.getList().get(0) : null;
+
+                    Date now = new Date();
+
+                    if (content_.contains("进入闲聊") || content_.contains("进入聊天") || "闲聊模式".equals(content_) || "闲聊".equals(content_) || "聊天".equals(content_) || "聊天模式".equals(content_)) {
+
+                        UserText ut = new UserText();
+                        ut.setContent(content_);
+                        ut.setCreateTime(new Date());
+                        ut.setOpenId(fromUserName);
+                        ut.setType(msgType);
+                        ut.setStatus(2);
+                        userTextService.add(ut);
+                        respContent = "你好呀，现在可以和我聊天了哦o(∩_∩)o 哈哈";
+                        textMessage.setContent(respContent);
+                        respMessage = MessageUtil.messageToXml(textMessage);
+                        return respMessage;
+                    } else if (content_.contains("退出") || content_.contains("exit")) {
+                        UserText ut = new UserText();
+                        ut.setContent(content_);
+                        ut.setCreateTime(new Date());
+                        ut.setOpenId(fromUserName);
+                        ut.setType(msgType);
+                        ut.setStatus(3);
+                        userTextService.add(ut);
+                        respContent = "您已经退出闲聊模式";
+                        textMessage.setContent(respContent);
+                        respMessage = MessageUtil.messageToXml(textMessage);
+                        return respMessage;
+                    } else if (userText != null && !userText.getCreateTime().before(DateUtil.addMinute(now, 30)) && userText.getCreateTime().after(chatOutUt.getCreateTime())) {
+
+                        TAipNlp aipNlp = new TAipNlp(TENCENT_AI_APP_ID, TENCENT_AI_APP_KEY);
+                        String session = new Date().getTime() / 1000 + "";
+
+                        String result = aipNlp.nlpTextchat(session,content_);
+                        userText.setCreateTime(now);
+                        userTextService.add(userText);
+
+                        respContent = result;
+                        textMessage.setContent(respContent);
+                        respMessage = MessageUtil.messageToXml(textMessage);
+                        return respMessage;
+                    } else if (userText != null && userText.getCreateTime().before(DateUtil.addMinute(now, 30)) && userText.getCreateTime().after(chatOutUt.getCreateTime())) {
+
+                        UserText ut = new UserText();
+                        ut.setContent(content_);
+                        ut.setCreateTime(new Date());
+                        ut.setOpenId(fromUserName);
+                        ut.setType(msgType);
+                        ut.setStatus(3);
+                        userTextService.add(ut);
+                        respContent = "您已经超过了30分钟，自动退出闲聊模式";
+                        textMessage.setContent(respContent);
+                        respMessage = MessageUtil.messageToXml(textMessage);
+                        return respMessage;
+                    } else {
+                        UserText ut = new UserText();
+                        ut.setContent(content_);
+                        ut.setCreateTime(new Date());
+                        ut.setOpenId(fromUserName);
+                        ut.setType(msgType);
+                        ut.setStatus(1);
+                        userTextService.add(ut);
+                        Viptxt txt = new Viptxt();
+                        txt.setTitle(TextSplitUtils.getMaxText(content_));
+                        PageInfo<Viptxt> txtList = vipTxtSerivce.findPage(1, 10, txt);
+                        for (Viptxt viptxt : txtList.getList()) {
+                            setArticleInfo(articleList, viptxt.getTitle(), "这里是简介" + viptxt.getTitle(), viptxt.getImgurl(), viptxt.getAurl());
+                        }
                     }
-                } else {
-                    setArticleInfo(articleList,"对不起","请输入文字","http://uploads.xuexila.com/allimg/1602/681-16021FS9153C.png","");
+
 
                 }
-                if (articleList.size()<=0) {
+
+                if (articleList.size() <= 0) {
                     //单图文
-                    setArticleInfo(articleList,"对不起","您检索的问题我们暂时没有提供","http://uploads.xuexila.com/allimg/1602/681-16021FS9153C.png","");
+                    setArticleInfo(articleList, "对不起", "您检索的问题我们暂时没有提供", "http://uploads.xuexila.com/allimg/1602/681-16021FS9153C.png", "");
                 }
 
                 newsMessage.setArticleCount(articleList.size());
@@ -188,10 +269,11 @@ public class CoreServiceImpl implements ICoreService {
         }
         String url = request.getRequestURL().toString();
 
-        logger.info("searchname--->"+searchName);
-        logger.info("fromUser--->"+fromUserName);
-        logger.info("type--->"+type);
-        logger.info("url--->"+url);
+
+        logger.info("searchname--->" + searchName);
+        logger.info("fromUser--->" + fromUserName);
+        logger.info("type--->" + type);
+        logger.info("url--->" + url);
         logger.info("最后结束");
 
         return respMessage;
@@ -199,19 +281,20 @@ public class CoreServiceImpl implements ICoreService {
 
     /**
      * 设置范文内容
+     *
      * @param articleList
      * @param title
      * @param description
      * @param imgurl
      * @param url
      */
-    private void setArticleInfo(List<Article> articleList,String title,String description,String imgurl,String url) {
+    private void setArticleInfo(List<Article> articleList, String title, String description, String imgurl, String url) {
         //单图文
         Article article = new Article();
         article.setTitle(title);
         article.setDescription(description);
         article.setPicUrl(imgurl);
-        article.setUrl(url==null?"":url);
+        article.setUrl(url == null ? "" : url);
         articleList.add(article);
     }
 

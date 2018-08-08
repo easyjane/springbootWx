@@ -6,6 +6,7 @@ import com.test.entity.Article;
 import com.test.entity.ArticleExample;
 import com.test.mapper.ArticleMapper;
 import com.test.service.IArticleService;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,11 +24,9 @@ public class ArticleServiceImpl implements IArticleService {
 
     @Override
     public int add(Article obj) {
-        Article article = new Article();
-        article.setContent("这里是内容");
-        article.setCreateTime(new Date());
-        article.setDate("2010-01-02");
-        return articleMapper.insert(article);
+        if (StringUtils.isNotBlank(obj.getAid()))
+            return articleMapper.updateByPrimaryKey(obj);
+        return articleMapper.insert(obj);
     }
 
     @Override
@@ -35,6 +34,9 @@ public class ArticleServiceImpl implements IArticleService {
         PageHelper.startPage(pageNo,pageSize);
         ArticleExample example = new ArticleExample();
         example.setOrderByClause("aid desc");
+        if (StringUtils.isNotBlank(obj.getContent())) {
+
+        }
         List<Article> list = articleMapper.selectByExample(example);
         return new PageInfo<>(list);
     }

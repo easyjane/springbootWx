@@ -11,6 +11,8 @@ public class Article {
 
     private String intro;
 
+    private String content;
+
     private Date createTime;
 
     private String editor;
@@ -22,8 +24,6 @@ public class Article {
     private Date editTime;
 
     private String title;
-
-    private String content;
 
     public String getAid() {
         return aid;
@@ -55,6 +55,14 @@ public class Article {
 
     public void setIntro(String intro) {
         this.intro = intro == null ? null : intro.trim();
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content == null ? null : content.trim();
     }
 
     public Date getCreateTime() {
@@ -103,13 +111,5 @@ public class Article {
 
     public void setTitle(String title) {
         this.title = title == null ? null : title.trim();
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content == null ? null : content.trim();
     }
 }

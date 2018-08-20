@@ -13,15 +13,11 @@ public interface ArticleMapper {
 
     int insertSelective(Article record);
 
-    List<Article> selectByExampleWithBLOBs(ArticleExample example);
-
     List<Article> selectByExample(ArticleExample example);
 
     Article selectByPrimaryKey(String aid);
 
     int updateByPrimaryKeySelective(Article record);
-
-    int updateByPrimaryKeyWithBLOBs(Article record);
 
     int updateByPrimaryKey(Article record);
 }

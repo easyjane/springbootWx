@@ -44,10 +44,15 @@ public class CoreServiceImpl implements ICoreService {
     private IUserFocusService userFocusService;
 
     @Autowired
-    private IVipTxtSerivce vipTxtSerivce;
+    private IVipTxtService vipTxtService;
 
     @Autowired
     private IUserTextService userTextService;
+
+    @Autowired
+    private IIndexArticleService indexArticleService;
+
+
 
 
     @Override
@@ -99,7 +104,11 @@ public class CoreServiceImpl implements ICoreService {
                     Date now = new Date();
                     logger.info("userText"+userText);
                     logger.info("chatOutUt"+chatOutUt);
-                    if (content_.contains("进入闲聊") || content_.contains("进入聊天") || "闲聊模式".equals(content_) || "闲聊".equals(content_) || "聊天".equals(content_) || "聊天模式".equals(content_)) {
+                    if (content_.equals("那年今日") || content_.equals("那年今天") || content_.equals("历史今天") || content_.equals("今天历史")) {
+
+
+
+                    } else if (content_.contains("进入闲聊") || content_.contains("进入聊天") || "闲聊模式".equals(content_) || "闲聊".equals(content_) || "聊天".equals(content_) || "聊天模式".equals(content_)) {
                         logger.info("进入闲聊");
                         return out30Min(fromUserName, respMessage, msgType, textMessage, content_, 2, "你好呀，现在可以和我聊天了哦o(∩_∩)o 哈哈");
                     } else if (content_.contains("退出") || content_.contains("exit")) {
@@ -132,13 +141,17 @@ public class CoreServiceImpl implements ICoreService {
                         Map resultMap = (Map) JsonUtils.str2Obj(result,Map.class,paraMap);
                         if (!resultMap.get("ret").toString().equals("0")) {
                             respContent = "你说什么啊？";
+                        } else {
+                            Map dataMap = (Map) resultMap.get("data");
+                            respContent = dataMap.get("answer").toString();
                         }
-                        Map dataMap = (Map) resultMap.get("data");
-                        respContent = dataMap.get("answer").toString();
+
                         textMessage.setContent(respContent);
                         respMessage = MessageUtil.messageToXml(textMessage);
                         return respMessage;
-                    }else {
+                    } else if (content_.contains("菜谱") || content_.contains("吃饭") || content_.contains("饿了") || content_.contains("好饿")) {
+
+                    } else{
                         logger.info("判断失败了");
                         UserText ut = new UserText();
                         ut.setContent(content_);
@@ -149,7 +162,7 @@ public class CoreServiceImpl implements ICoreService {
                         userTextService.add(ut);
                         Viptxt txt = new Viptxt();
                         txt.setTitle(TextSplitUtils.getMaxText(content_));
-                        PageInfo<Viptxt> txtList = vipTxtSerivce.findPage(1, 10, txt);
+                        PageInfo<Viptxt> txtList = vipTxtService.findPage(1, 10, txt);
                         for (Viptxt viptxt : txtList.getList()) {
                             setArticleInfo(articleList, viptxt.getTitle(), "这里是简介" + viptxt.getTitle(), viptxt.getImgurl(), viptxt.getAurl());
                         }
@@ -304,40 +317,30 @@ public class CoreServiceImpl implements ICoreService {
         articleList.add(article);
     }
 
+    /**
+     * 获取关注公众号之后的消息
+     * @param newsMessage
+     * @param articleList
+     * @param WX_URL
+     * @return
+     */
     private NewsMessage getFirstArticle(NewsMessage newsMessage, List<Article> articleList, String WX_URL) {
-        Article article1 = new Article();
-        article1.setTitle("艳辉网，分享福利的网站");
-        article1.setDescription("");
-        //article.setUrl(WX_URL+"wx/index.html");
-        article1.setPicUrl(WX_URL + "resource/img/blog/tuwen/wx-first.jpg");
-        article1.setUrl(WX_URL + "wx/index.html");
-        Article article2 = new Article();
-        article2.setTitle("一键加群");
-        article2.setDescription("");
-        article2.setPicUrl(WX_URL + "resource/img/blog/tuwen/wx1我.jpg");
-        article2.setUrl("https://jq.qq.com/?_wv=1027&k=5NtFofZ");
-        Article article3 = new Article();
-        article3.setTitle("关注博客");
-        article3.setDescription("");
-        article3.setPicUrl(WX_URL + "resource/img/blog/tuwen/wx2要.jpg");
-        article3.setUrl("http://blog.csdn.net/sinat_15153911");
 
-        Article article4 = new Article();
-        article4.setTitle("关于我们");
-        article4.setDescription("");
-        article4.setPicUrl(WX_URL + "resource/img/blog/tuwen/wx3福.jpg");
-        article4.setUrl("https://user.qzone.qq.com/490647751/blog/1511836766");
+        IndexArticle indexArticle = new IndexArticle();
+        indexArticle.setStatus(2);
+        PageInfo<IndexArticle> indexArticlePageInfo = indexArticleService.findPage(1,10,indexArticle);
 
-        Article article5 = new Article();
-        article5.setTitle("福利活动");
-        article5.setDescription("暂未开通");
-        article5.setPicUrl(WX_URL + "resource/img/blog/tuwen/wx4利.jpg");
-        article5.setUrl("http://blog.csdn.net/sinat_15153911");
-        articleList.add(article1);
-        articleList.add(article2);
-        articleList.add(article3);
-        articleList.add(article4);
-        articleList.add(article5);
+        Article article = new Article();
+        for (IndexArticle ia: indexArticlePageInfo.getList()
+             ) {
+            article.setTitle(ia.getTitle());
+            article.setDescription(ia.getDescription());
+            //article.setUrl(WX_URL+"wx/index.html");
+            article.setPicUrl(ia.getPicUrl());
+            article.setUrl(ia.getUrl());
+            articleList.add(article);
+        }
+
         newsMessage.setArticleCount(articleList.size());
         newsMessage.setArticles(articleList);
         return newsMessage;

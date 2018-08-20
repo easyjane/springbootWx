@@ -34,8 +34,9 @@ public class ArticleServiceImpl implements IArticleService {
         PageHelper.startPage(pageNo,pageSize);
         ArticleExample example = new ArticleExample();
         example.setOrderByClause("aid desc");
-        if (StringUtils.isNotBlank(obj.getContent())) {
-
+        ArticleExample.Criteria criteria = example.createCriteria();
+        if (StringUtils.isNotBlank(obj.getDate())) {
+            criteria.andDateEqualTo(obj.getDate());
         }
         List<Article> list = articleMapper.selectByExample(example);
         return new PageInfo<>(list);

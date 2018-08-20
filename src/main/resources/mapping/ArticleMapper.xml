@@ -6,15 +6,13 @@
     <result column="date" jdbcType="VARCHAR" property="date" />
     <result column="date_china" jdbcType="VARCHAR" property="dateChina" />
     <result column="intro" jdbcType="VARCHAR" property="intro" />
+    <result column="content" jdbcType="VARCHAR" property="content" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="editor" jdbcType="VARCHAR" property="editor" />
     <result column="edit_name" jdbcType="VARCHAR" property="editName" />
-    <result column="status" jdbcType="TINYINT" property="status" />
+    <result column="status" jdbcType="INTEGER" property="status" />
     <result column="edit_time" jdbcType="TIMESTAMP" property="editTime" />
     <result column="title" jdbcType="VARCHAR" property="title" />
-  </resultMap>
-  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.test.entity.Article">
-    <result column="content" jdbcType="LONGVARCHAR" property="content" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -46,29 +44,9 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    aid, date, date_china, intro, create_time, editor, edit_name, status, edit_time, 
+    aid, date, date_china, intro, content, create_time, editor, edit_name, status, edit_time, 
     title
   </sql>
-  <sql id="Blob_Column_List">
-    content
-  </sql>
-  <select id="selectByExampleWithBLOBs" parameterType="com.test.entity.ArticleExample" resultMap="ResultMapWithBLOBs">
-    select
-    <if test="distinct">
-      distinct
-    </if>
-    'true' as QUERYID,
-    <include refid="Base_Column_List" />
-    ,
-    <include refid="Blob_Column_List" />
-    from article
-    <if test="_parameter != null">
-      <include refid="Example_Where_Clause" />
-    </if>
-    <if test="orderByClause != null">
-      order by ${orderByClause}
-    </if>
-  </select>
   <select id="selectByExample" parameterType="com.test.entity.ArticleExample" resultMap="BaseResultMap">
     select
     <if test="distinct">
@@ -84,11 +62,9 @@
       order by ${orderByClause}
     </if>
   </select>
-  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="ResultMapWithBLOBs">
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
-    ,
-    <include refid="Blob_Column_List" />
     from article
     where aid = #{aid,jdbcType=VARCHAR}
   </select>
@@ -101,13 +77,13 @@
       select REPLACE(UUID(),'-','')
     </selectKey>
     insert into article (aid, date, date_china, 
-      intro, create_time, editor, 
-      edit_name, status, edit_time, 
-      title, content)
+      intro, content, create_time, 
+      editor, edit_name, status, 
+      edit_time, title)
     values (#{aid,jdbcType=VARCHAR}, #{date,jdbcType=VARCHAR}, #{dateChina,jdbcType=VARCHAR}, 
-      #{intro,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{editor,jdbcType=VARCHAR}, 
-      #{editName,jdbcType=VARCHAR}, #{status,jdbcType=TINYINT}, #{editTime,jdbcType=TIMESTAMP}, 
-      #{title,jdbcType=VARCHAR}, #{content,jdbcType=LONGVARCHAR})
+      #{intro,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{editor,jdbcType=VARCHAR}, #{editName,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, 
+      #{editTime,jdbcType=TIMESTAMP}, #{title,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.test.entity.Article">
     <selectKey keyProperty="aid" resultType="java.lang.String" order="BEFORE">
@@ -127,6 +103,9 @@
       <if test="intro != null">
         intro,
       </if>
+      <if test="content != null">
+        content,
+      </if>
       <if test="createTime != null">
         create_time,
       </if>
@@ -145,9 +124,6 @@
       <if test="title != null">
         title,
       </if>
-      <if test="content != null">
-        content,
-      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="aid != null">
@@ -162,6 +138,9 @@
       <if test="intro != null">
         #{intro,jdbcType=VARCHAR},
       </if>
+      <if test="content != null">
+        #{content,jdbcType=VARCHAR},
+      </if>
       <if test="createTime != null">
         #{createTime,jdbcType=TIMESTAMP},
       </if>
@@ -172,16 +151,13 @@
         #{editName,jdbcType=VARCHAR},
       </if>
       <if test="status != null">
-        #{status,jdbcType=TINYINT},
+        #{status,jdbcType=INTEGER},
       </if>
       <if test="editTime != null">
         #{editTime,jdbcType=TIMESTAMP},
       </if>
       <if test="title != null">
         #{title,jdbcType=VARCHAR},
-      </if>
-      <if test="content != null">
-        #{content,jdbcType=LONGVARCHAR},
       </if>
     </trim>
   </insert>
@@ -203,6 +179,9 @@
       <if test="intro != null">
         intro = #{intro,jdbcType=VARCHAR},
       </if>
+      <if test="content != null">
+        content = #{content,jdbcType=VARCHAR},
+      </if>
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
@@ -213,7 +192,7 @@
         edit_name = #{editName,jdbcType=VARCHAR},
       </if>
       <if test="status != null">
-        status = #{status,jdbcType=TINYINT},
+        status = #{status,jdbcType=INTEGER},
       </if>
       <if test="editTime != null">
         edit_time = #{editTime,jdbcType=TIMESTAMP},
@@ -221,24 +200,7 @@
       <if test="title != null">
         title = #{title,jdbcType=VARCHAR},
       </if>
-      <if test="content != null">
-        content = #{content,jdbcType=LONGVARCHAR},
-      </if>
     </set>
-    where aid = #{aid,jdbcType=VARCHAR}
-  </update>
-  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.test.entity.Article">
-    update article
-    set date = #{date,jdbcType=VARCHAR},
-      date_china = #{dateChina,jdbcType=VARCHAR},
-      intro = #{intro,jdbcType=VARCHAR},
-      create_time = #{createTime,jdbcType=TIMESTAMP},
-      editor = #{editor,jdbcType=VARCHAR},
-      edit_name = #{editName,jdbcType=VARCHAR},
-      status = #{status,jdbcType=TINYINT},
-      edit_time = #{editTime,jdbcType=TIMESTAMP},
-      title = #{title,jdbcType=VARCHAR},
-      content = #{content,jdbcType=LONGVARCHAR}
     where aid = #{aid,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.test.entity.Article">
@@ -246,12 +208,14 @@
     set date = #{date,jdbcType=VARCHAR},
       date_china = #{dateChina,jdbcType=VARCHAR},
       intro = #{intro,jdbcType=VARCHAR},
+      content = #{content,jdbcType=VARCHAR},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       editor = #{editor,jdbcType=VARCHAR},
       edit_name = #{editName,jdbcType=VARCHAR},
-      status = #{status,jdbcType=TINYINT},
+      status = #{status,jdbcType=INTEGER},
       edit_time = #{editTime,jdbcType=TIMESTAMP},
       title = #{title,jdbcType=VARCHAR}
     where aid = #{aid,jdbcType=VARCHAR}
   </update>
+
 </mapper>

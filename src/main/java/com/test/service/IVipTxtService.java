@@ -4,7 +4,7 @@ import com.github.pagehelper.PageInfo;
 import com.test.IBaseService;
 import com.test.entity.Viptxt;
 
-public interface IVipTxtSerivce extends IBaseService<Viptxt,String> {
+public interface IVipTxtService extends IBaseService<Viptxt,String> {
 
     @Override
     int add(Viptxt obj);

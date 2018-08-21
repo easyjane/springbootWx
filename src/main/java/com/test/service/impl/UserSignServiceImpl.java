@@ -31,6 +31,30 @@ public class UserSignServiceImpl implements IUserSignService {
         PageHelper.startPage(pageNo,pageSize);
         UserSignExample example = new UserSignExample();
 
+        UserSignExample.Criteria criteria = example.createCriteria();
+        if (StringUtils.isNotBlank(obj.getTableName())) {
+            criteria.andTableNameEqualTo(obj.getTableName());
+        }
+        example.setOrderByClause("create_time desc");
+        List list = userSignMapper.selectByExample(example);
+        return new PageInfo<>(list);
+    }
+
+    @Override
+    public PageInfo<UserSign> findPageLikeItemOr(int pageNo, int pageSize, UserSign obj) {
+        PageHelper.startPage(pageNo,pageSize);
+        UserSignExample example = new UserSignExample();
+
+        UserSignExample.Criteria criteria = example.createCriteria();
+        if (StringUtils.isNotBlank(obj.getTableName())) {
+            example.or().andTableNameLike("%"+obj.getTableName()+"%");
+        }
+        if (StringUtils.isNotBlank(obj.getUsername())) {
+            example.or().andUsernameLike("%"+obj.getUsername()+"%");
+        }
+        if (StringUtils.isNotBlank(obj.getPhone())) {
+            example.or().andPhoneLike("%"+obj.getTableName()+"%");
+        }
         example.setOrderByClause("create_time desc");
         List list = userSignMapper.selectByExample(example);
         return new PageInfo<>(list);

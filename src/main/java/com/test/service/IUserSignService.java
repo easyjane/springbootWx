@@ -12,6 +12,8 @@ public interface IUserSignService extends IBaseService<UserSign,String> {
     @Override
     PageInfo<UserSign> findPage(int pageNo, int pageSize, UserSign obj);
 
+    PageInfo<UserSign> findPageLikeItemOr(int pageNo, int pageSize, UserSign obj);
+
     @Override
     UserSign selectByPrimaryKey(String sid);
 

@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.test.mapper.UserSignMapper" >
+  <resultMap id="BaseResultMap" type="com.test.entity.UserSign" >
+    <id column="usid" property="usid" jdbcType="VARCHAR" />
+    <result column="username" property="username" jdbcType="VARCHAR" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="table_name" property="tableName" jdbcType="VARCHAR" />
+    <result column="is_sign" property="isSign" jdbcType="INTEGER" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="edit_time" property="editTime" jdbcType="TIMESTAMP" />
+    <result column="useable" property="useable" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    usid, username, phone, table_name, is_sign, create_time, edit_time, useable
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.test.entity.UserSignExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    'true' as QUERYID,
+    <include refid="Base_Column_List" />
+    from user_sign
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from user_sign
+    where usid = #{usid,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from user_sign
+    where usid = #{usid,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.test.entity.UserSign" >
+    <selectKey keyProperty="usid" resultType="java.lang.String" order="BEFORE">
+      select REPLACE(UUID(),'-','')
+    </selectKey>
+    insert into user_sign (usid, username, phone, 
+      table_name, is_sign, create_time, 
+      edit_time, useable)
+    values (#{usid,jdbcType=VARCHAR}, #{username,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, 
+      #{tableName,jdbcType=VARCHAR}, #{isSign,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{editTime,jdbcType=TIMESTAMP}, #{useable,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.test.entity.UserSign" >
+    <selectKey keyProperty="usid" resultType="java.lang.String" order="BEFORE">
+      select REPLACE(UUID(),'-','')
+    </selectKey>
+    insert into user_sign
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="usid != null" >
+        usid,
+      </if>
+      <if test="username != null" >
+        username,
+      </if>
+      <if test="phone != null" >
+        phone,
+      </if>
+      <if test="tableName != null" >
+        table_name,
+      </if>
+      <if test="isSign != null" >
+        is_sign,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="editTime != null" >
+        edit_time,
+      </if>
+      <if test="useable != null" >
+        useable,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="usid != null" >
+        #{usid,jdbcType=VARCHAR},
+      </if>
+      <if test="username != null" >
+        #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="tableName != null" >
+        #{tableName,jdbcType=VARCHAR},
+      </if>
+      <if test="isSign != null" >
+        #{isSign,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="editTime != null" >
+        #{editTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="useable != null" >
+        #{useable,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.test.entity.UserSignExample" resultType="java.lang.Integer" >
+    select count(*) from user_sign
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByPrimaryKeySelective" parameterType="com.test.entity.UserSign" >
+    update user_sign
+    <set >
+      <if test="username != null" >
+        username = #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        phone = #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="tableName != null" >
+        table_name = #{tableName,jdbcType=VARCHAR},
+      </if>
+      <if test="isSign != null" >
+        is_sign = #{isSign,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="editTime != null" >
+        edit_time = #{editTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="useable != null" >
+        useable = #{useable,jdbcType=INTEGER},
+      </if>
+    </set>
+    where usid = #{usid,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.test.entity.UserSign" >
+    update user_sign
+    set username = #{username,jdbcType=VARCHAR},
+      phone = #{phone,jdbcType=VARCHAR},
+      table_name = #{tableName,jdbcType=VARCHAR},
+      is_sign = #{isSign,jdbcType=INTEGER},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      edit_time = #{editTime,jdbcType=TIMESTAMP},
+      useable = #{useable,jdbcType=INTEGER}
+    where usid = #{usid,jdbcType=VARCHAR}
+  </update>
+  <select id="login" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from user_sign
+    where username = #{username,jdbcType=VARCHAR}
+    and phone =  #{phone,jdbcType=VARCHAR}
+  </select>
+</mapper>

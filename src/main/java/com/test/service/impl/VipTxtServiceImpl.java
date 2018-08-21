@@ -5,7 +5,7 @@ import com.github.pagehelper.PageInfo;
 import com.test.entity.Viptxt;
 import com.test.entity.ViptxtExample;
 import com.test.mapper.ViptxtMapper;
-import com.test.service.IVipTxtSerivce;
+import com.test.service.IVipTxtService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,7 +15,7 @@ import java.util.List;
 
 @Service
 @Transactional
-public class VipTxtServiceImpl implements IVipTxtSerivce {
+public class VipTxtServiceImpl implements IVipTxtService {
 
     @Autowired
     private ViptxtMapper viptxtMapper;

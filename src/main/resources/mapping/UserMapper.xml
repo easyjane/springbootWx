@@ -74,6 +74,9 @@
     where uid = #{uid,jdbcType=VARCHAR}
   </delete>
   <insert id="insert" parameterType="com.test.entity.User">
+    <selectKey keyProperty="uid" resultType="java.lang.String" order="BEFORE">
+      select REPLACE(UUID(),'-','')
+    </selectKey>
     insert into user (uid, name, open_id, 
       create_time, img, status, 
       nickname, sex, country, 
@@ -86,6 +89,9 @@
       )
   </insert>
   <insert id="insertSelective" parameterType="com.test.entity.User">
+    <selectKey keyProperty="uid" resultType="java.lang.String" order="BEFORE">
+      select REPLACE(UUID(),'-','')
+    </selectKey>
     insert into user
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="uid != null">

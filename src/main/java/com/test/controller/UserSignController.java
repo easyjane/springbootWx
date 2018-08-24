@@ -45,6 +45,8 @@ public class UserSignController {
         if (us == null) {
             return Result.setResult(404, "姓名或者电话不正确", "");
         }
+        us.setIsSign(1);
+        userSignService.add(us);
         Map map = new HashMap();
         map.put("id", us.getUsid());
 
@@ -162,12 +164,18 @@ public class UserSignController {
      * @return
      */
     @RequestMapping("/userList")
-    public Object userList(int pageNo,int pageSize,String searchKey) {
+    public Object userList(int pageNo,int pageSize,String searchKey,Integer isSign) {
 
         UserSign us = new UserSign();
-        us.setTableName(searchKey);
-        us.setUsername(searchKey);
-        us.setPhone(searchKey);
+        if (StringUtils.isNotBlank(searchKey)) {
+            us.setTableName(searchKey);
+            us.setUsername(searchKey);
+            us.setPhone(searchKey);
+        }
+        if (isSign != null) {
+            us.setIsSign(isSign);
+        }
+
 
         PageInfo pageInfo = userSignService.findPageLikeItemOr(pageNo,pageSize,us);
 

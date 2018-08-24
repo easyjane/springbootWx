@@ -28,7 +28,7 @@ public class UserSignServiceImpl implements IUserSignService {
 
     @Override
     public PageInfo<UserSign> findPage(int pageNo, int pageSize, UserSign obj) {
-        PageHelper.startPage(pageNo,pageSize);
+        PageHelper.startPage(pageNo, pageSize);
         UserSignExample example = new UserSignExample();
 
         UserSignExample.Criteria criteria = example.createCriteria();
@@ -42,19 +42,51 @@ public class UserSignServiceImpl implements IUserSignService {
 
     @Override
     public PageInfo<UserSign> findPageLikeItemOr(int pageNo, int pageSize, UserSign obj) {
-        PageHelper.startPage(pageNo,pageSize);
+        PageHelper.startPage(pageNo, pageSize);
         UserSignExample example = new UserSignExample();
 
-        UserSignExample.Criteria criteria = example.createCriteria();
-        if (StringUtils.isNotBlank(obj.getTableName())) {
-            example.or().andTableNameLike("%"+obj.getTableName()+"%");
+        if (obj.getIsSign() != null) {
+
+            if (StringUtils.isNotBlank(obj.getTableName())) {
+                UserSignExample.Criteria criteria1 = example.createCriteria();
+                criteria1.andTableNameLike("%" + obj.getTableName() + "%");
+                criteria1.andIsSignEqualTo(obj.getIsSign());
+                example.or(criteria1);
+            } else {
+                UserSignExample.Criteria criteria = example.createCriteria();
+                criteria.andIsSignEqualTo(obj.getIsSign());
+            }
+            if (StringUtils.isNotBlank(obj.getUsername())) {
+                UserSignExample.Criteria criteria1 = example.createCriteria();
+                criteria1.andUsernameLike("%" + obj.getUsername() + "%");
+                criteria1.andIsSignEqualTo(obj.getIsSign());
+                example.or(criteria1);
+            }
+            if (StringUtils.isNotBlank(obj.getPhone())) {
+                UserSignExample.Criteria criteria1 = example.createCriteria();
+                criteria1.andPhoneLike("%" + obj.getTableName() + "%");
+                criteria1.andIsSignEqualTo(obj.getIsSign());
+                example.or(criteria1);
+            }
+
+        } else {
+            if (StringUtils.isNotBlank(obj.getTableName())) {
+                UserSignExample.Criteria criteria1 = example.createCriteria();
+                criteria1.andTableNameLike("%" + obj.getTableName() + "%");
+                example.or(criteria1);
+            }
+            if (StringUtils.isNotBlank(obj.getUsername())) {
+                UserSignExample.Criteria criteria1 = example.createCriteria();
+                criteria1.andUsernameLike("%" + obj.getUsername() + "%");
+                example.or(criteria1);
+            }
+            if (StringUtils.isNotBlank(obj.getPhone())) {
+                UserSignExample.Criteria criteria1 = example.createCriteria();
+                criteria1.andPhoneLike("%" + obj.getTableName() + "%");
+                example.or(criteria1);
+            }
         }
-        if (StringUtils.isNotBlank(obj.getUsername())) {
-            example.or().andUsernameLike("%"+obj.getUsername()+"%");
-        }
-        if (StringUtils.isNotBlank(obj.getPhone())) {
-            example.or().andPhoneLike("%"+obj.getTableName()+"%");
-        }
+
         example.setOrderByClause("create_time desc");
         List list = userSignMapper.selectByExample(example);
         return new PageInfo<>(list);
@@ -67,6 +99,6 @@ public class UserSignServiceImpl implements IUserSignService {
 
     @Override
     public UserSign login(String username, String phone) {
-        return userSignMapper.login(new UserSign(username,phone));
+        return userSignMapper.login(new UserSign(username, phone));
     }
 }

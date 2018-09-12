@@ -38,12 +38,12 @@ public class UserSignController {
     @RequestMapping("/login")
     public Object login(String username, String phone) {
 
-        if (StringUtils.isBlank(username) && StringUtils.isBlank(phone)) {
-            return Result.setResult(404, "姓名或电话不能为空", "");
+        if (StringUtils.isBlank(username)) {
+            return Result.setResult(404, "姓名不能为空", "");
         }
-        UserSign us = userSignService.login(username, phone);
+        UserSign us = userSignService.login(username, null);
         if (us == null) {
-            return Result.setResult(404, "姓名或者电话不正确", "");
+            return Result.setResult(404, "暂无此数据", "");
         }
         us.setIsSign(1);
         userSignService.add(us);

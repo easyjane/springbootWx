@@ -78,6 +78,7 @@ public class BaiduAipController {
         // 上传图片
         try {
             img.transferTo(new File(url+ fileName + "." + suffix));
+            logger.info(url+ fileName + "." + suffix);
         } catch (IOException e) {
             e.printStackTrace();
         }

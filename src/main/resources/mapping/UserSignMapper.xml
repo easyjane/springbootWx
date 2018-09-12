@@ -186,6 +186,8 @@
     <include refid="Base_Column_List" />
     from user_sign
     where username = #{username,jdbcType=VARCHAR}
+    <if test="phone != null" >
     and phone =  #{phone,jdbcType=VARCHAR}
+    </if>
   </select>
 </mapper>
